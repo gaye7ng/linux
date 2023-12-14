@@ -32,7 +32,9 @@ struct message{
 
 void signalHandler(int signum) {
 }
-void saveToMariaDB(const char *value){
+void saveToMariaDB(int senid, const char *value){
+}
+void sendToMQTT(char *topic, const char *value){
 }
 
 
@@ -80,8 +82,10 @@ int main() {
                 int i=0;
 
                 while (token != NULL) {
-                    strcpy( senval[i], token); printf("%s\n", token);
-                    token = strtok(NULL, ":"); i++;
+                    strcpy( senval[i], token);
+                    printf("%s\n", token);
+                    token = strtok(NULL, ":");
+                    i++;
                 }
 
                 for(int i=0; i < 2; i++) {
@@ -91,9 +95,9 @@ int main() {
             }
         }
         close(pipefd[0]);
+
     } else {
         close(pipefd[0]);
-
         dup2(pipefd[1], STDOUT_FILENO);
 
         if (execl("./temperatuer.c", "temperatuer", NULL) == -1) {
@@ -109,8 +113,6 @@ int main() {
 
 void saveToMariaDB(int senid, const char *value){
     MYSQL *conn=mysql_init(NULL);
-
-    char senval[2][10];
 
     if(conn==NULL){
         fprintf(stderr, "mysql_init() failed\n");
@@ -138,7 +140,7 @@ void sendToMQTT(char *topic, const char *value){
     MQTTClient_connectOptions conn_opts=MQTTClient_connectOptions_initializer;
     int rc;
 
-    MQTTClinet_create(&client, MQTT_BROKER_ADDRESS, MQTT_CLIENT_ID, MQTTCLIENT_PRESISTENCE_NONE, NULL);
+    MQTTClinet_create(&client, MQTT_BROKER_ADDRESS, MQTT_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
     conn_opts.keepAliveInterval=20;
     conn_opts.cleansession=1;
 
