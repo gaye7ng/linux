@@ -145,7 +145,7 @@ void sendToMQTT(char *topic, const char *value){
         exit(EXIT_FAILURE);
     }
 
-    MQTTClient_message pubmsg=MQTTClient_message_initalizer;
+    MQTTClient_message pubmsg=MQTTClient_message_initializer;
     pubmsg.payload = (void *)value;
     pubmsg.payloadlen = strlen(value);
     pubmsg.qos = 1;
