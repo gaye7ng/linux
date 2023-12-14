@@ -145,7 +145,7 @@ int main() {
         close(pipefd[0]);
         dup2(pipefd[1], STDOUT_FILENO);
 
-        if (execl("./temperature.c", "temperature", (char*)NULL) == -1) {
+        if (execl("./temperature", "temperature", (char*)NULL) == -1) {
             perror("execl");
             exit(EXIT_FAILURE);
         }
