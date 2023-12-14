@@ -32,10 +32,6 @@ struct message{
 
 void signalHandler(int signum) {
 }
-void saveToMariaDB(int senid, const char *value){
-}
-void sendToMQTT(char *topic, const char *value){
-}
 
 
 int main() {
