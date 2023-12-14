@@ -136,6 +136,13 @@ int main() {
                 for(int i=0; i < 2; i++) {
                     saveToMariaDB((i+1), senval[i]);
                     sendToMQTT(topics[i], senval[i]);
+
+                        if (sendid=1){
+                            saveToMariaDB(4, senval(sendid));
+                        }
+                        else if(sendid=2){
+                            saveToMariaDB(5, senval(senid));
+                        }
                 }
             }
         }
