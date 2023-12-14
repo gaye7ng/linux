@@ -20,6 +20,9 @@
 #define MQTT_TOPIC1 "test/temp"
 #define MQTT_TOPIC2 "test/humi"
 
+void signalHandler(int signum) {
+}
+
 char topics[2][10]={
     "test/temp",
     "test/humi"
@@ -30,7 +33,53 @@ struct message{
     char msg_text[MAX_TEXT];
 };
 
-void signalHandler(int signum) {
+void saveToMariaDB(int senid, const char *value){
+    MYSQL *conn=mysql_init(NULL);
+
+    if(conn==NULL){
+        fprintf(stderr, "mysql_init() failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if(mysql_real_connect(conn, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, 0, NULL, 0)==NULL){
+        fprintf(stderr, "mysql_real_connect() failed\n");
+        mysql_close(conn);
+        exit(EXIT_FAILURE);
+    }
+
+    char query[256];
+    sprintf(query, "INSERT INTO SensorData (sensor_id, reading, timestamp) VALUES (%d, '%s', sysdate())", senid, value);
+
+    if(mysql_query(conn, query)!=0){
+        fprintf(stderr, "MariaDB query execution failed: %s\n", mysql_error(conn));
+    }
+
+    mysql_close(conn);
+}
+
+void sendToMQTT(char *topic, const char *value){
+    MQTTClient client;
+    MQTTClient_connectOptions conn_opts=MQTTClient_connectOptions_initializer;
+    int rc;
+
+    MQTTClient_create(&client, MQTT_BROKER_ADDRESS, MQTT_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+    conn_opts.keepAliveInterval=20;
+    conn_opts.cleansession=1;
+
+    if((rc=MQTTClient_connect(client, &conn_opts))!=MQTTCLIENT_SUCCESS){
+        fprintf(stderr, "Failed to connect to MQTT broker: %d\n", rc);
+        exit(EXIT_FAILURE);
+    }
+
+    MQTTClient_message pubmsg=MQTTClient_message_initializer;
+    pubmsg.payload = (void *)value;
+    pubmsg.payloadlen = strlen(value);
+    pubmsg.qos = 1;
+    pubmsg.retained = 0;
+
+    MQTTClient_publishMessage(client, topic, &pubmsg, NULL);
+    MQTTClient_disconnect(client, 10000);
+    MQTTClient_destroy(&client);
 }
 
 
@@ -105,53 +154,4 @@ int main() {
     }
 
     return 0;
-}
-
-void saveToMariaDB(int senid, const char *value){
-    MYSQL *conn=mysql_init(NULL);
-
-    if(conn==NULL){
-        fprintf(stderr, "mysql_init() failed\n");
-        exit(EXIT_FAILURE);
-    }
-
-    if(mysql_real_connect(conn, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, 0, NULL, 0)==NULL){
-        fprintf(stderr, "mysql_real_connect() failed\n");
-        mysql_close(conn);
-        exit(EXIT_FAILURE);
-    }
-
-    char query[256];
-    sprintf(query, "INSERT INTO SensorData (sensor_id, reading, timestamp) VALUES (%d, '%s', sysdate())", senid, value);
-
-    if(mysql_query(conn, query)!=0){
-        fprintf(stderr, "MariaDB query execution failed: %s\n", mysql_error(conn));
-    }
-
-    mysql_close(conn);
-}
-
-void sendToMQTT(char *topic, const char *value){
-    MQTTClient client;
-    MQTTClient_connectOptions conn_opts=MQTTClient_connectOptions_initializer;
-    int rc;
-
-    MQTTClinet_create(&client, MQTT_BROKER_ADDRESS, MQTT_CLIENT_ID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
-    conn_opts.keepAliveInterval=20;
-    conn_opts.cleansession=1;
-
-    if((rc=MQTTClient_conect(client, &conn_opts))!=MQTTCLIENT_SUCCESS){
-        fprintf(stderr, "Failed to connect to MQTT broker: %d\n", rc);
-        exit(EXIT_FAILURE);
-    }
-
-    MQTTClient_message pubmsg=MQTTClient_message_initializer;
-    pubmsg.payload = (void *)value;
-    pubmsg.payloadlen = strlen(value);
-    pubmsg.qos = 1;
-    pubmsg.retained = 0;
-
-    MQTTClient_publishMessage(client, topic, &pubmsg, NULL);
-    MQTTClient_disconnect(client, 10000);
-    MQTTClient_destroy(&client);
 }
