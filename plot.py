@@ -29,4 +29,5 @@ plt.plot(temp['timestamp'], temp['reading'], marker='o', linestyle='-', color='r
 plt.plot(humi['timestamp'], humi['reading'], marker='o', linestyle='-', color='blue', label='Humidity')
 plt.xlabel('Timestamp')
 plt.ylabel()
+plt.savefig('./plot.png')
 plt.show()
