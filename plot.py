@@ -7,8 +7,8 @@ myMyConn = pymysql.connect(user='gayeong', password='young', host='localhost', p
 myMyCursor = myMyConn.cursor()
 
 # 실행할 SQL 생성
-sqlt = "SELECT  sensorid, reading, timestamp FROM mydb.SensorData WHERE sensorid=1"
-sqlh = "SELECT  sensorid, reading, timestamp FROM mydb.SensorData WHERE sensorid=2"
+sqlt = "SELECT sensor_id, reading, timestamp FROM mydb.SensorData WHERE sensor_id=1"
+sqlh = "SELECT sensor_id, reading, timestamp FROM mydb.SensorData WHERE sensor_id=2"
 
 temp = pd.read_sql(sqlt, myMyConn)
 humi = pd.read_sql(sqlh, myMyConn)
