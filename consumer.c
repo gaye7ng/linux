@@ -137,6 +137,8 @@ int main() {
                     saveToMariaDB((i+1), senval[i]);
                     sendToMQTT(topics[i], senval[i]);
                 }
+
+                sleep(5)
             }
         }
         close(pipefd[0]);
