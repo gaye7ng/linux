@@ -138,7 +138,7 @@ int main() {
                     sendToMQTT(topics[i], senval[i]);
                 }
 
-                sleep(1)
+                sleep(1);
             }
         }
         close(pipefd[0]);
