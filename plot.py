@@ -26,7 +26,7 @@ def update_plot():
         ax.plot(humi['timestamp'], humi['reading'], marker='o', linestyle='-', color='blue', label='Humidity')
         plt.xlabel('Timestamp')
         plt.draw()
-        plt.pause(10)   # 10초마다 업데이트
+        plt.pause(3)   # 10초마다 업데이트
 
 try:
     update_plot()
