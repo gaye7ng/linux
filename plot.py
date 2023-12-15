@@ -24,7 +24,7 @@ def update_plot():
         ax.clear()
         ax.plot(temp['timestamp'], temp['reading'], marker='o', linestyle='-', color='red', label='Temperature')
         ax.plot(humi['timestamp'], humi['reading'], marker='o', linestyle='-', color='blue', label='Humidity')
-        ax.xlabel('Timestamp')
+        plt.xlabel('Timestamp')
         plt.draw()
         plt.pause(10)   # 10초마다 업데이트
 
