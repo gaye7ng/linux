@@ -48,7 +48,7 @@ void saveToMariaDB(int senid, const char *value){
     }
 
     char query[256];
-    sprintf(query, "INSERT INTO SensorData (sensor_id, reading, timestamp, temperature, humidity) VALUES (%d, '%s', sysdate(), '%s', '%s')", senid, value);
+    sprintf(query, "INSERT INTO SensorData (sensor_id, reading, timestamp) VALUES (%d, '%s', sysdate())", senid, value);
 
     if(mysql_query(conn, query)!=0){
         fprintf(stderr, "MariaDB query execution failed: %s\n", mysql_error(conn));
@@ -136,7 +136,6 @@ int main() {
                 for(int i=0; i < 2; i++) {
                     saveToMariaDB((i+1), senval[i]);
                     sendToMQTT(topics[i], senval[i]);
-                    saveToMariaDB((i+4), senval[i+3]);
                 }
             }
         }
