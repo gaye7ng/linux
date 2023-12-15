@@ -58,7 +58,7 @@ int main( )
         return 1;
     }
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; ; i++) {
         /* HTS221 장치 초기화 */
         wiringPiI2CWriteReg8(i2c_fd, CTRL_REG1, 0x00);
         wiringPiI2CWriteReg8(i2c_fd, CTRL_REG1, 0x84);

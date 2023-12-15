@@ -1,24 +1,34 @@
 import pymysql
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 
-# MySQL 연결 처리
-myMyConn = pymysql.connect(user='gayeong', password='young', host='localhost', port=3306, charset='utf8', database='mydb')
-myMyCursor = myMyConn.cursor()
+plt.ion()
 
-# 실행할 SQL 생성
-sqlt = "SELECT sensor_id, reading, timestamp FROM mydb.SensorData WHERE sensor_id=1"
-sqlh = "SELECT sensor_id, reading, timestamp FROM mydb.SensorData WHERE sensor_id=2"
+def update_plot():
+    fig, ax = plt.subplots()
 
-temp = pd.read_sql(sqlt, myMyConn)
-humi = pd.read_sql(sqlh, myMyConn)
+    while(1):
+        conn = pymysql.connect(user='gayeong', password='young', host='localhost', port=3306, charset='utf8', database='mydb')
+        mycursor = conn.cursor()
 
-print(temp)
-print(humi)
+        sqlt = "SELECT sensor_id, reading, timestamp FROM mydb.SensorData WHERE sensor_id=1"
+        sqlh = "SELECT sensor_id, reading, timestamp FROM mydb.SensorData WHERE sensor_id=2"
 
-plt.figure()
-plt.plot(temp['timestamp'], temp['reading'], marker='o', linestyle='-', color='red', label='Temperature')
-plt.plot(humi['timestamp'], humi['reading'], marker='o', linestyle='-', color='blue', label='Humidity')
-plt.xlabel('Timestamp')
-plt.savefig('./plot.png')
-plt.show()
+        temp = pd.read_sql(sqlt, conn)
+        humi = pd.read_sql(sqlh, conn)
+
+        print(temp)
+        print(humi)
+
+        ax.clear()
+        ax.plot(temp['timestamp'], temp['reading'], marker='o', linestyle='-', color='red', label='Temperature')
+        ax.plot(humi['timestamp'], humi['reading'], marker='o', linestyle='-', color='blue', label='Humidity')
+        ax.xlabel('Timestamp')
+        plt.draw()
+        plt.pause(10)   # 10초마다 업데이트
+
+try:
+    update_plot()
+except KeyboardInterrupt:
+    pass
