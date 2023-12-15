@@ -2,6 +2,9 @@ import random
 from picamera import PiCamera
 
 def camerasys():
+    def randnum():
+        return random.choice([0, 1])
+    
     int pir=randnum()   # pir 센서
     int bt=randnum()    # 버튼
     camera=PiCamera()
